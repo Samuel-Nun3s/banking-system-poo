@@ -49,7 +49,7 @@ export default abstract class Account {
     throw new Error("Impossivel depositar valores menores ou igual a 0");
   }
 
-  withdraw = (value: number): Number => {
+  withdraw(value: number): Number {
     if (value <= this.#balance) {
       transactionsArray.push({
         id: transactionsArray.length + 1,
@@ -90,8 +90,12 @@ export default abstract class Account {
     }
   }
 
-  getBalance = (): number => {
+  getBalance(): number {
     return this.#balance;
+  }
+
+  setBalance(value: number): number {
+    return this.#balance += value;
   }
 
   getExtract = (): TransactionsModel[] => {
