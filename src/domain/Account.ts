@@ -1,15 +1,15 @@
-import { transactionsArray } from "../data/transactions.js";
-import { TransactionsModel } from "../models/Transactions.js";
-import { accountArray } from "../data/account.js";
 import { clientsArray } from "../data/clients.js";
+
+import { TransactionsModel } from "../models/Transactions.js";
 import { AccountModel } from "../models/Account.js";
 
 export default abstract class Account {
   #number: Number;
   #balance: number;
   #client: Number;
+  #transactionHistory: Array<TransactionsModel>;
 
-  constructor(client: Number) {
+  constructor(client: Number, id: Number) {
 
     if (this.searchClient(client)) {
       this.#client = client;
@@ -17,26 +17,19 @@ export default abstract class Account {
       throw new Error("O usuario nao existe");
     }
 
-    this.#number = this.generateId();
+    this.#number = id;
     this.#balance = 0;
-  }
-
-  generateId = (): Number => {
-    return accountArray.length += 1;
+    this.#transactionHistory = []
   }
 
   searchClient = (clientId: Number): boolean => {
     return clientsArray.some(c => c.id === clientId);
   }
 
-  searchAccount = (accountId: Number): AccountModel | undefined => {
-    return accountArray.find(a => a.number === accountId);
-  }
-
   deposit = (value: number): Number => {
     if (value > 0) {
-      transactionsArray.push({
-        id: transactionsArray.length += 1,
+      this.#transactionHistory.push({
+        id: this.#transactionHistory.length + 1,
         accountNumber: this.#number,
         type: 'deposit',
         value,
@@ -51,8 +44,8 @@ export default abstract class Account {
 
   withdraw(value: number): Number {
     if (value <= this.#balance) {
-      transactionsArray.push({
-        id: transactionsArray.length + 1,
+      this.#transactionHistory.push({
+        id: this.#transactionHistory.length + 1,
         accountNumber: this.#number,
         type: 'withdraw',
         value: value,
@@ -65,20 +58,20 @@ export default abstract class Account {
     throw new Error("Impossivel sacar um valor maior que o saldo");
   }
 
-  transfer = (value: number, accountDestination: number): void => {
-    const accountReceived = this.searchAccount(accountDestination);
+  transfer = (value: number, accountDestination: Account): void => {
+    const accountReceived = accountDestination;
 
     if (accountReceived) {
       if (value <= this.#balance) {
         this.#balance -= value;
 
-        accountReceived.balance += value;
+        accountReceived.setBalance(value);
         
-        transactionsArray.push({
-          id: transactionsArray.length += 1,
+        this.#transactionHistory.push({
+          id: this.#transactionHistory.length + 1,
           type: 'transfer',
           accountNumber: this.#number,
-          whoReceived: accountDestination,
+          whoReceived: accountDestination.getNumber(),
           value: value,
           date: new Date()
         });
@@ -94,11 +87,15 @@ export default abstract class Account {
     return this.#balance;
   }
 
-  setBalance(value: number): number {
+  protected setBalance(value: number): number {
     return this.#balance += value;
   }
 
   getExtract = (): TransactionsModel[] => {
-    return transactionsArray.filter(t => t.accountNumber === this.#number);
+    return this.#transactionHistory;
+  }
+
+  getNumber = (): Number => {
+    return this.#number;
   }
 }

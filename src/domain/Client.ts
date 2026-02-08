@@ -1,7 +1,7 @@
 import { clientsArray } from "../data/clients.js";
 
 export default class Client {
-  id: Number;
+  id: number;
   name: String;
   cpf: String;
 
@@ -18,16 +18,12 @@ export default class Client {
       throw new Error("O campo CPF nao pode ser vazio!");
     }
 
-    this.id = this.generateId();
+    this.id = clientsArray.length + 1;
 
     this.createClient(this.id, this.name, this.cpf);
   }
 
-  generateId = (): Number => {
-    return clientsArray.length += 1;
-  }
-
-  createClient = (id:Number, name: String, cpf: String): void => {
+  createClient = (id: Number, name: String, cpf: String): void => {
     clientsArray.push({ id, name, cpf });
   }
 }

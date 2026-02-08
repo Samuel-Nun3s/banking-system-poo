@@ -1,3 +1,3 @@
-import { ClientModel } from '../models/Client.js';
+import { ClientModel } from "../models/Client";
 
 export const clientsArray: ClientModel[] = [];
